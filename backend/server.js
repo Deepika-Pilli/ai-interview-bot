@@ -3,8 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import multer from "multer";
 import fs from "fs";
-import * as pdfParse from "pdf-parse";
-
+import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
 
 import { ChatGroq } from "@langchain/groq";
 import { HumanMessage } from "@langchain/core/messages";
@@ -15,7 +14,9 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5175",
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"],
+    credentials: true,
   })
 );
 app.use(express.json());
@@ -129,10 +130,19 @@ app.post(
         req.file.path
       );
 
-      const pdfData =
-        await pdfParse.default(dataBuffer);
+      const pdfDoc =
+        await getDocument({ data: new Uint8Array(dataBuffer) }).promise;
 
-      const resumeText = pdfData.text;
+      let resumeText = "";
+      for (let i = 1; i <= pdfDoc.numPages; i++) {
+        const page = await pdfDoc.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items
+          .map((item) => item.str)
+          .join(" ");
+        resumeText += pageText + "\n\n";
+      }
+      //pdfDoc.destroy();
 
       const prompt = `
 You are an expert ATS resume analyzer.
