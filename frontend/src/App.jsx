@@ -49,7 +49,7 @@ function App() {
     try {
 
       const response = await fetch(
-        "http://localhost:5000/chat",
+        "https://ai-interview-backend-28l1.onrender.com/chat",
         {
           method: "POST",
 
@@ -101,7 +101,7 @@ function App() {
     setScores([]);
     setResumeAnalysis("");
 
-    await fetch("http://localhost:5000/clear", {
+    await fetch("https://ai-interview-backend-28l1.onrender.com/clear", {
       method: "POST",
     });
   };
@@ -119,7 +119,7 @@ function App() {
     try {
 
       const response = await fetch(
-        "http://localhost:5000/resume",
+        "https://ai-interview-backend-28l1.onrender.com/resume",
         {
           method: "POST",
           body: formData,
